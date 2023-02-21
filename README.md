@@ -1,1 +1,2 @@
-# auca-esp-project-thermometer
+# Embedded System Programming
+
