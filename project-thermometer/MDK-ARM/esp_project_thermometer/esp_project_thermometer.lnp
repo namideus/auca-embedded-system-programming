@@ -1,0 +1,26 @@
+--cpu Cortex-M0+
+"esp_project_thermometer\startup_stm32l053xx.o"
+"esp_project_thermometer\main.o"
+"esp_project_thermometer\stm32l0xx_it.o"
+"esp_project_thermometer\stm32l0xx_hal_msp.o"
+"esp_project_thermometer\stm32l0xx_hal_tim.o"
+"esp_project_thermometer\stm32l0xx_hal_tim_ex.o"
+"esp_project_thermometer\stm32l0xx_hal.o"
+"esp_project_thermometer\stm32l0xx_hal_i2c.o"
+"esp_project_thermometer\stm32l0xx_hal_i2c_ex.o"
+"esp_project_thermometer\stm32l0xx_hal_rcc.o"
+"esp_project_thermometer\stm32l0xx_hal_rcc_ex.o"
+"esp_project_thermometer\stm32l0xx_hal_flash_ramfunc.o"
+"esp_project_thermometer\stm32l0xx_hal_flash.o"
+"esp_project_thermometer\stm32l0xx_hal_flash_ex.o"
+"esp_project_thermometer\stm32l0xx_hal_gpio.o"
+"esp_project_thermometer\stm32l0xx_hal_dma.o"
+"esp_project_thermometer\stm32l0xx_hal_pwr.o"
+"esp_project_thermometer\stm32l0xx_hal_pwr_ex.o"
+"esp_project_thermometer\stm32l0xx_hal_cortex.o"
+"esp_project_thermometer\stm32l0xx_hal_exti.o"
+"esp_project_thermometer\system_stm32l0xx.o"
+--strict --scatter "esp_project_thermometer\esp_project_thermometer.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "esp_project_thermometer.map" -o esp_project_thermometer\esp_project_thermometer.axf
