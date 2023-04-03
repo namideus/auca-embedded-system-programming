@@ -375,7 +375,7 @@ int main(void) {
   /* Initialize the EPD */
   BSP_EPD_Init();
 
-//  void BSP_EPD_Clear(uint16_t Color)
+  void BSP_EPD_Clear(/*uint16_t Color*/)
   {
     uint32_t i;
 
@@ -453,35 +453,30 @@ int main(void) {
     // EPD_Delay(10);
   }
 
-  while(1) {
+  BSP_EPD_Clear();
 
-	  gde021a1_SetDisplayWindow(0, 0, GDE021A1_EPD_PIXEL_WIDTH - 1, GDE021A1_EPD_PIXEL_HEIGHT - 1);
-		     for (uint32_t i = 0; i < GDE021A1_EPD_PIXEL_WIDTH * GDE021A1_EPD_PIXEL_HEIGHT; i++) {
-		       gde021a1_WritePixel(EPD_COLOR_WHITE);
-		     }
+  while(1)
+  {
+	BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!!!", CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear();
 
-		BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!!!", CENTER_MODE);
-		BSP_EPD_RefreshDisplay();
+	HAL_Delay(2000);
+	BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear();
 
-		  gde021a1_SetDisplayWindow(0, 0, GDE021A1_EPD_PIXEL_WIDTH - 1, GDE021A1_EPD_PIXEL_HEIGHT - 1);
-			     for (uint32_t i = 0; i < GDE021A1_EPD_PIXEL_WIDTH * GDE021A1_EPD_PIXEL_HEIGHT; i++) {
-			       gde021a1_WritePixel(EPD_COLOR_WHITE);
-			     }
+	HAL_Delay(2000);
+	BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear();
 
-		HAL_Delay(1000);
-		BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
-		BSP_EPD_RefreshDisplay();
+	HAL_Delay(2000);
+	BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear();
 
-		  gde021a1_SetDisplayWindow(0, 0, GDE021A1_EPD_PIXEL_WIDTH - 1, GDE021A1_EPD_PIXEL_HEIGHT - 1);
-			     for (uint32_t i = 0; i < GDE021A1_EPD_PIXEL_WIDTH * GDE021A1_EPD_PIXEL_HEIGHT; i++) {
-			       gde021a1_WritePixel(EPD_COLOR_WHITE);
-			     }
-
-		HAL_Delay(1000);
-		BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
-		BSP_EPD_RefreshDisplay();
-
-		HAL_Delay(1000);
+	HAL_Delay(2000);
 
 //    PIN_SET(LED_RED);
 //    LoopDelay(DELAY_CONSTANT / 3);
