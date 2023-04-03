@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := project-thermometer-with-dth11
+BUILD_ARTIFACT_NAME := projecy-thermometer-dth11
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-project-thermometer-with-dth11.elf \
+projecy-thermometer-dth11.elf \
 
 MAP_FILES += \
-project-thermometer-with-dth11.map \
+projecy-thermometer-dth11.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-project-thermometer-with-dth11.list \
+projecy-thermometer-dth11.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: project-thermometer-with-dth11.elf secondary-outputs
+main-build: projecy-thermometer-dth11.elf secondary-outputs
 
 # Tool invocations
-project-thermometer-with-dth11.elf project-thermometer-with-dth11.map: $(OBJS) $(USER_OBJS) C:\Users\nami-pc\Desktop\AUCA_2023_SPRING\Embedded\ System\ Programming\auca-embedded-system-programming\project-thermometer-with-dth11\STM32L053C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "project-thermometer-with-dth11.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\nami-pc\Desktop\AUCA_2023_SPRING\Embedded System Programming\auca-embedded-system-programming\project-thermometer-with-dth11\STM32L053C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="project-thermometer-with-dth11.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+projecy-thermometer-dth11.elf projecy-thermometer-dth11.map: $(OBJS) $(USER_OBJS) C:\Users\nami-pc\Desktop\AUCA_2023_SPRING\Embedded\ System\ Programming\auca-embedded-system-programming\projecy-thermometer-dth11\STM32L053C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "projecy-thermometer-dth11.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\nami-pc\Desktop\AUCA_2023_SPRING\Embedded System Programming\auca-embedded-system-programming\projecy-thermometer-dth11\STM32L053C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="projecy-thermometer-dth11.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-project-thermometer-with-dth11.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "project-thermometer-with-dth11.list"
+projecy-thermometer-dth11.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "projecy-thermometer-dth11.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout project-thermometer-with-dth11.elf project-thermometer-with-dth11.list project-thermometer-with-dth11.map
+	-$(RM) default.size.stdout projecy-thermometer-dth11.elf projecy-thermometer-dth11.list projecy-thermometer-dth11.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
