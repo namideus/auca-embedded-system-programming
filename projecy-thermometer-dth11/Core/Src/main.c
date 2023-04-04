@@ -1,5 +1,3 @@
-// epaper demo
-
 #include "main.h"
 #include "stm32l053xx.h"
 #include "stm32l0xx_hal_rcc.h"
@@ -353,7 +351,7 @@ int main(void) {
 
   while(1)
   {
-	BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!!!", CENTER_MODE);
+	BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!", CENTER_MODE);
 	BSP_EPD_RefreshDisplay();
 	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
