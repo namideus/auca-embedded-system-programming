@@ -1,12 +1,11 @@
 // epaper demo
 
 #include "main.h"
-#include "stm32l0xx_hal_gpio.h"
-#include <stdint.h>
 #include "stm32l053xx.h"
-#include "gde021a1.h"
-#include "picture.h"
 #include "stm32l0xx_hal_rcc.h"
+#include "stm32l0xx_hal_gpio.h"
+#include "picture.h"
+#include "gde021a1.h"
 #include "stm32l0538_discovery.h"
 #include "stm32l0538_discovery_epd.h"
 
