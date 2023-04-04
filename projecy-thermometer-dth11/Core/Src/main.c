@@ -10,7 +10,6 @@
 #include "stm32l0538_discovery.h"
 #include "stm32l0538_discovery_epd.h"
 
-
 // -------- stuff missing from the stm32XXXxx.h
   // GPIOx_MODER - 2 bits per pin
 #define GPIO_Mode_In                         0x00  // GPIO Input Mode
@@ -62,9 +61,6 @@
 #define GPIO_AlternateFunction_COMP1     7
 #define GPIO_AlternateFunction_COMP2     7
 
-
-
-
 // baudrate definitions
 #define  SPI_CR1_BR__2          0   // fPCLK/2
 #define  SPI_CR1_BR__4          1   // fPCLK/4
@@ -79,15 +75,11 @@
 #define  SPI_CR1_DFF__8         0    // 8 bits
 #define  SPI_CR1_DFF__16        1    // 16 bits
 
-
-
-
 // ---- some of the trivial stuff
 #define GLUE(a, b) a##b
 #define PIN_SET(a) do {GLUE(a, _GPIO_PORT)->BSRR = (1 << GLUE(a, _PIN));} while(0)
 #define PIN_CLR(a) do {GLUE(a, _GPIO_PORT)->BSRR = (1 << (GLUE(a, _PIN) + 16));} while(0)
 #define PIN_GET(a) (!!(GLUE(a, _GPIO_PORT)->IDR & (1 << GLUE(a, _PIN))))
-
 
 void LoopDelay(volatile uint32_t n) {
 	while(n > 0) n--;
@@ -95,16 +87,11 @@ void LoopDelay(volatile uint32_t n) {
 
 #define DELAY_CONSTANT 30000
 
-
-
 // --------------------- some board-dependent defines and code
 #define LED_RED_GPIO_PORT    GPIOA
 #define LED_RED_PIN          5
 #define LED_GREEN_GPIO_PORT  GPIOB
 #define LED_GREEN_PIN        4
-
-
-
 
 // ------- implement functions to get the epaper stuff working
 
@@ -123,9 +110,6 @@ void LoopDelay(volatile uint32_t n) {
 #define DISCOVERY_SPIx_MOSI_PIN                 5
 // no - there's no MISO connected, and PB4 is used for LED on the DISCO
 // #define DISCOVERY_SPIx_MISO_PIN                 GPIO_PIN_4                 /* PB.04 */
-
-
-
 
 static void SPIx_Init(void) {
 
@@ -168,10 +152,6 @@ static void SPIx_Write(uint8_t n) {
 }
 
 
-
-
-
-
 // pins pinit - see init in main()
 #define EPD_CS_GPIO_PORT                        GPIOA
 #define EPD_CS_PIN                              15
@@ -187,7 +167,6 @@ static void SPIx_Write(uint8_t n) {
 
 #define EPD_PWR_GPIO_PORT                       GPIOB
 #define EPD_PWR_PIN                             10
-
 
 
 void EPD_IO_Init(void) {
@@ -265,7 +244,6 @@ void EPD_Delay (uint32_t n) {
 
 
 // ---------------------- M A I N -----------------------------------
-
 
 int main(void) {
  /*!< Set MSION bit */
@@ -367,144 +345,34 @@ int main(void) {
   );
 
 
-  gde021a1_Init();
-
-
   HAL_Init();
 
   /* Initialize the EPD */
   BSP_EPD_Init();
 
-  void BSP_EPD_Clear(/*uint16_t Color*/)
-  {
-    uint32_t i;
-
-    gde021a1_SetDisplayWindow(0, 0, GDE021A1_EPD_PIXEL_WIDTH - 1, GDE021A1_EPD_PIXEL_HEIGHT - 1);
-    for (i = 0; i < GDE021A1_EPD_PIXEL_WIDTH * GDE021A1_EPD_PIXEL_HEIGHT; i++) {
-      gde021a1_WritePixel(EPD_COLOR_WHITE);
-    }
-  }
-
-// draw something
-  {
-    uint32_t i;
-
-//    BSP_EPD_DisplayStringAt(0,0,"hello world", CENTER_MODE);
-//
-//    BSP_EPD_RefreshDisplay();
-
-//    BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
-//    BSP_EPD_RefreshDisplay();
-//
-//    HAL_Delay(5000);
-//    BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_2);
-//    BSP_EPD_RefreshDisplay();
-//
-//    HAL_Delay(5000);
-//    BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_3);
-//    BSP_EPD_RefreshDisplay();
-//
-//    HAL_Delay(5000);
-//    BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_4);
-//    BSP_EPD_RefreshDisplay();
-
-//    HAL_Delay(5000);
-
-        //--------------working part
-//	  gde021a1_SetDisplayWindow(0, 0, 172, 72);
-      //gde021a1_DrawImage(0, 0, 72, 172, (uint8_t*) picture_2);
-      //gde021a1_RefreshDisplay();
-
-      //BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_3);
-      //BSP_EPD_RefreshDisplay();
-
-     //BSP_EPD_DisplayStringAtLine
-
-//
-//    gde021a1_SetDisplayWindow(0, 10, GDE021A1_EPD_PIXEL_WIDTH - 1, 10);
-//    for (i = 0; i < GDE021A1_EPD_PIXEL_WIDTH; i++) {
-//      gde021a1_WritePixel(EPD_COLOR_BLACK);
-//    }
-//    gde021a1_SetDisplayWindow(0, 12, GDE021A1_EPD_PIXEL_WIDTH - 1, 12);
-//    for (i = 0; i < GDE021A1_EPD_PIXEL_WIDTH; i++) {
-//      gde021a1_WritePixel(EPD_COLOR_DARKGRAY);
-//    }
-//    gde021a1_SetDisplayWindow(0, 14, GDE021A1_EPD_PIXEL_WIDTH - 1, 14);
-//    for (i = 0; i < GDE021A1_EPD_PIXEL_WIDTH; i++) {
-//      gde021a1_WritePixel(EPD_COLOR_LIGHTGRAY);
-//    }
-  }
-
-
-
-// void BSP_EPD_RefreshDisplay(void)
-  {
-    /* Refresh display sequence */
-    //gde021a1_RefreshDisplay();
-	BSP_EPD_RefreshDisplay();
-
-    /* Poll on the BUSY signal and wait for the EPD to be ready */
-    while (PIN_GET(EPD_BUSY));
-
-    /*  EPD reset pin mamagement */
-    // ??? EPD_RESET_HIGH();
-
-    /* Add a 10 ms Delay after EPD pin Reset */
-    // EPD_Delay(10);
-  }
-
-  BSP_EPD_Clear();
+  BSP_EPD_Clear(EPD_COLOR_WHITE);
 
   while(1)
   {
 	BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!!!", CENTER_MODE);
 	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
 	HAL_Delay(2000);
 	BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
 	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
 	HAL_Delay(2000);
 	BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
 	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
 	HAL_Delay(2000);
 	BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
 	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
 	HAL_Delay(2000);
-
-//    PIN_SET(LED_RED);
-//    LoopDelay(DELAY_CONSTANT / 3);
-//    PIN_CLR(LED_RED);
-//    LoopDelay(DELAY_CONSTANT);
-//    PIN_SET(LED_GREEN);
-//    LoopDelay(DELAY_CONSTANT / 3);
-//    PIN_CLR(LED_GREEN);
-//    LoopDelay(DELAY_CONSTANT);
-//
-//    #else
-//    GPIOA->BSRR = 0
-//      | GPIO_BSRR_BS_5          // RED LED - set
-//    ;
-//    LoopDelay(DELAY_CONSTANT);
-//    GPIOA->BSRR = 0
-//      | GPIO_BSRR_BR_5          // RED LED - reset
-//    ;
-//    LoopDelay(DELAY_CONSTANT);
-//
-//    GPIOB->BSRR = 0
-//      | GPIO_BSRR_BS_4          // GREEN LED - set
-//    ;
-//    LoopDelay(DELAY_CONSTANT);
-//    GPIOB->BSRR = 0
-//      | GPIO_BSRR_BR_4          // GREEN LED - reset
-//    ;
-//    LoopDelay(DELAY_CONSTANT);
-//    #endif
   }
 }
