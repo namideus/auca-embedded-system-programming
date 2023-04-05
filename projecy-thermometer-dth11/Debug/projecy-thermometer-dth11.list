@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  0002003c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00003278  00000000  00000000  00020064  2**0
+ 12 .debug_info   0000333a  00000000  00000000  00020064  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 0000117d  00000000  00000000  000232dc  2**0
+ 13 .debug_abbrev 0000121b  00000000  00000000  0002339e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000490  00000000  00000000  00024460  2**3
+ 14 .debug_aranges 000004a0  00000000  00000000  000245c0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_macro  000125ed  00000000  00000000  000248f0  2**0
+ 15 .debug_macro  00013279  00000000  00000000  00024a60  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_line   0000569e  00000000  00000000  00036edd  2**0
+ 16 .debug_line   000058d2  00000000  00000000  00037cd9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    0006fd50  00000000  00000000  0003c57b  2**0
+ 17 .debug_str    00073bc9  00000000  00000000  0003d5ab  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .comment      00000050  00000000  00000000  000ac2cb  2**0
+ 18 .comment      00000050  00000000  00000000  000b1174  2**0
                   CONTENTS, READONLY
- 19 .debug_ranges 000003c8  00000000  00000000  000ac320  2**3
+ 19 .debug_ranges 000003d8  00000000  00000000  000b11c8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00000db8  00000000  00000000  000ac6e8  2**2
+ 20 .debug_frame  00000df8  00000000  00000000  000b15a0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1365,10 +1365,10 @@ void EPD_Delay (uint32_t n) {
  80008cc:	00000bb8 	.word	0x00000bb8
 
 080008d0 <main>:
+	return DHT11_OK;
+	//return check_sum;
+}
 
-
-
-// ---------------------- M A I N -----------------------------------
 
 int main(void) {
  80008d0:	b580      	push	{r7, lr}
