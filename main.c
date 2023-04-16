@@ -239,21 +239,19 @@ void EPD_Delay (uint32_t n) {
   LoopDelay(n * 3000);  // some fancy factor to get it roughly in ms
 }
 
-
-
 // ---------------------- M A I N -----------------------------------
 uint16_t read_cycle(uint16_t cur_tics, uint8_t neg_tic){
 	uint16_t cnt_tics;
  	if (cur_tics < MAX_TICS) cnt_tics = 0;
 	if (neg_tic){
-		//while (!GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_3)&&(cnt_tics<MAX_TICS)){
-			//cnt_tics++;
-		//}
+		while (!GPIO_ReadInputDataBit(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
+			cnt_tics++;
+		}
 	}
 	else {
-		//while (GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_3)&&(cnt_tics<MAX_TICS)){
-//			cnt_tics++;
-	//	}
+		while (GPIO_ReadInputDataBit(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
+			cnt_tics++;
+		}
 	}
  	return cnt_tics;
 }
@@ -264,10 +262,10 @@ uint8_t read_DHT11(uint8_t *buf){
 	uint8_t i, check_sum;
 
 	//reset DHT11
-	/*Delay(500);
- 	GPIO_LOW(GPIOA,GPIO_Pin_2);
+	Delay(500);
+ 	GPIO_LOW(GPIOA,GPIO_PIN_2);
 	Delay(20);
- 	GPIO_HIGH(GPIOA,GPIO_Pin_2);
+ 	GPIO_HIGH(GPIOA,GPIO_PIN_2);
 
   //start reading
  	cnt = 0;
@@ -282,7 +280,7 @@ uint8_t read_DHT11(uint8_t *buf){
 	}
 
  	//release line
-	GPIO_HIGH(GPIOA,GPIO_Pin_2);
+	GPIO_HIGH(GPIOA,GPIO_PIN_2);
 
 	if (cnt>=MAX_TICS) return DHT11_NO_CONN;
 
@@ -305,12 +303,15 @@ uint8_t read_DHT11(uint8_t *buf){
 		buf++;
 	}
 
-	if (*buf != check_sum) return DHT11_CS_ERROR;*/
+	if (*buf != check_sum) return DHT11_CS_ERROR;
 
 	return DHT11_OK;
 	//return check_sum;
 }
 
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
 
 int main(void) {
  /*!< Set MSION bit */
@@ -343,7 +344,6 @@ int main(void) {
     | RCC_APB2ENR_SPI1EN
   ;
 
-
   GPIOA->MODER = (GPIOA->MODER
     & (~GPIO_MODER_MODE5)      // RED LED
     & (~GPIO_MODER_MODE8)      // EPD_BUSY
@@ -364,9 +364,6 @@ int main(void) {
   ) | (0
     | (GPIO_PullDown * GPIO_PUPDR_PUPD8_0)  // EPD_BUSY
   );
-
-
-
 
   GPIOB->MODER = (GPIOB->MODER
     & (~GPIO_MODER_MODE4)      // GREEN LED
@@ -414,6 +411,12 @@ int main(void) {
 
   HAL_Init();
 
+ /* Configure the system clock */
+  SystemClock_Config();
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+
   /* Initialize the EPD */
   BSP_EPD_Init();
 
@@ -443,3 +446,115 @@ int main(void) {
 	HAL_Delay(2000);
   }
 }
+
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = 0;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_5;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PA2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
