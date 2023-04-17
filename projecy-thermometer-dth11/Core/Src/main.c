@@ -410,10 +410,11 @@ void Init_ePaper_GPIOs(void)
 }
 
 int main(void) {
-
-	Init_ePaper_GPIOs();
+	uint8_t buf[5], res;
 
 	HAL_Init();
+
+	Init_ePaper_GPIOs();
 
 	/* Configure the system clock */
 	SystemClock_Config();
@@ -516,7 +517,8 @@ static void MX_GPIO_Init(void)
 //  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+  GPIO_HIGH(GPIOA, GPIO_PIN_2);
 
   /*Configure GPIO pin : PA3 */
   GPIO_InitStruct.Pin = GPIO_PIN_3;
