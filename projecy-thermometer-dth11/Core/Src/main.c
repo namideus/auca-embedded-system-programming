@@ -1,12 +1,19 @@
 #include "main.h"
+#include "dht11.h"
 #include "stm32l053xx.h"
 #include "stm32l0xx_hal_rcc.h"
 #include "stm32l0xx_hal_gpio.h"
 #include "picture.h"
 #include "dht11.h"
+#include "utils.h"
 #include "gde021a1.h"
 #include "stm32l0538_discovery.h"
 #include "stm32l0538_discovery_epd.h"
+
+/* Private variables ---------------------------------------------------------*/
+RTC_HandleTypeDef hrtc;
+RTC_TimeTypeDef sTime = {0};
+RTC_DateTypeDef sDate = {0};
 
 // -------- stuff missing from the stm32XXXxx.h
   // GPIOx_MODER - 2 bits per pin
@@ -186,8 +193,6 @@ void EPD_IO_Init(void) {
   SPIx_Init();
 }
 
-
-
 void EPD_IO_WriteData(uint16_t n) {
   /* Reset EPD control line CS */
   PIN_CLR(EPD_CS);
@@ -244,12 +249,14 @@ uint16_t read_cycle(uint16_t cur_tics, uint8_t neg_tic){
 	uint16_t cnt_tics;
  	if (cur_tics < MAX_TICS) cnt_tics = 0;
 	if (neg_tic){
-		while (!GPIO_ReadInputDataBit(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
+		//while (!GPIO_ReadInputDataBit(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
+		while (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
 			cnt_tics++;
 		}
 	}
 	else {
-		while (GPIO_ReadInputDataBit(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
+		//while (GPIO_ReadInputDataBit(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
+		while (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3)&&(cnt_tics<MAX_TICS)){
 			cnt_tics++;
 		}
 	}
@@ -262,10 +269,12 @@ uint8_t read_DHT11(uint8_t *buf){
 	uint8_t i, check_sum;
 
 	//reset DHT11
-	Delay(500);
- 	GPIO_LOW(GPIOA,GPIO_PIN_2);
-	Delay(20);
- 	GPIO_HIGH(GPIOA,GPIO_PIN_2);
+	//Delay(500);
+	HAL_Delay(500);
+ 	GPIO_LOW(GPIOA,GPIO_PIN_3);
+	//Delay(20);
+	HAL_Delay(20);
+ 	GPIO_HIGH(GPIOA,GPIO_PIN_3);
 
   //start reading
  	cnt = 0;
@@ -280,7 +289,7 @@ uint8_t read_DHT11(uint8_t *buf){
 	}
 
  	//release line
-	GPIO_HIGH(GPIOA,GPIO_PIN_2);
+	GPIO_HIGH(GPIOA,GPIO_PIN_3);
 
 	if (cnt>=MAX_TICS) return DHT11_NO_CONN;
 
@@ -312,6 +321,7 @@ uint8_t read_DHT11(uint8_t *buf){
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_RTC_Init(void);
 
 void Init_ePaper_GPIOs(void)
 {
@@ -412,6 +422,8 @@ void Init_ePaper_GPIOs(void)
 int main(void) {
 	uint8_t buf[5], res;
 
+	char strDisp[25];
+
 	HAL_Init();
 
 	Init_ePaper_GPIOs();
@@ -419,36 +431,59 @@ int main(void) {
 	/* Configure the system clock */
 	SystemClock_Config();
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-
 	/* Initialize the EPD */
 	BSP_EPD_Init();
+	//BSP_EPD_RefreshDisplay();
+	//BSP_EPD_Clear(EPD_COLOR_WHITE);
 
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	//MX_RTC_Init();
+
+	/* Showcasing */
+	BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
+	BSP_EPD_RefreshDisplay();
 	BSP_EPD_Clear(EPD_COLOR_WHITE);
+	HAL_Delay(1000);
+
+	sprintf(strDisp, "%02d/%02d/%02d %02d:%02d:%02d", sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
+
+	BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);
+	HAL_Delay(5000);
 
 	while(1)
 	{
-		BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!", CENTER_MODE);
+		res = read_DHT11(buf);
+
+		if (res==DHT11_OK)
+			sprintf(strDisp, "RH=%02d%% t=%dC", buf[0], buf[2]);
+		else if (res==DHT11_CS_ERROR)
+			sprintf(strDisp,"CHECKSUM ERROR");
+		else if (res==DHT11_NO_CONN)
+			sprintf(strDisp,"NO CONNECTED");
+
+		BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
 		BSP_EPD_RefreshDisplay();
 		BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-		HAL_Delay(2000);
-		BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
-		BSP_EPD_RefreshDisplay();
-		BSP_EPD_Clear(EPD_COLOR_WHITE);
+//		HAL_Delay(2000);
+//		BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
+//		BSP_EPD_RefreshDisplay();
+//		BSP_EPD_Clear(EPD_COLOR_WHITE);
+//
+//		HAL_Delay(2000);
+//		BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
+//		BSP_EPD_RefreshDisplay();
+//		BSP_EPD_Clear(EPD_COLOR_WHITE);
+//
+//		HAL_Delay(2000);
+//		BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
+//		BSP_EPD_RefreshDisplay();
+//		BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-		HAL_Delay(2000);
-		BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
-		BSP_EPD_RefreshDisplay();
-		BSP_EPD_Clear(EPD_COLOR_WHITE);
-
-		HAL_Delay(2000);
-		BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
-		BSP_EPD_RefreshDisplay();
-		BSP_EPD_Clear(EPD_COLOR_WHITE);
-
-		HAL_Delay(2000);
+		HAL_Delay(100);
 	}
 }
 
@@ -495,6 +530,68 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0x10;
+  sTime.Minutes = 0x1;
+  sTime.Seconds = 0x20;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_MONDAY;
+  sDate.Month = RTC_MONTH_APRIL;
+  sDate.Date = 0x17;
+  sDate.Year = 0x23;
+
+  if (HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -509,21 +606,22 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PA2 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-  GPIO_HIGH(GPIOA, GPIO_PIN_2);
+//  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+//
+//  /*Configure GPIO pin : PA2 */
+//  GPIO_InitStruct.Pin = GPIO_PIN_2;
+//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+////  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+//  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+//  GPIO_HIGH(GPIOA, GPIO_PIN_2);
 
   /*Configure GPIO pin : PA3 */
   GPIO_InitStruct.Pin = GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -545,6 +643,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+	  BSP_EPD_DisplayStringAt(0, 40, (unsigned char*)"RTC ERROR OCCURRED", CENTER_MODE);
+	  BSP_EPD_RefreshDisplay();
+	  BSP_EPD_Clear(EPD_COLOR_WHITE);
   }
   /* USER CODE END Error_Handler_Debug */
 }

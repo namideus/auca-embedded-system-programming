@@ -8,6 +8,11 @@
 #include "stm32l0538_discovery.h"
 #include "stm32l0538_discovery_epd.h"
 
+/* Private variables ---------------------------------------------------------*/
+RTC_HandleTypeDef hrtc;
+RTC_TimeTypeDef sTime = {0};
+RTC_DateTypeDef sDate = {0};
+
 // -------- stuff missing from the stm32XXXxx.h
   // GPIOx_MODER - 2 bits per pin
 #define GPIO_Mode_In                         0x00  // GPIO Input Mode
@@ -312,139 +317,149 @@ uint8_t read_DHT11(uint8_t *buf){
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_RTC_Init(void);
+
+void Init_ePaper_GPIOs(void)
+{
+	/*!< Set MSION bit */
+	RCC->CR |= (uint32_t)0x00000100;
+
+	/*!< Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and MCOPRE[2:0] bits */
+	RCC->CFGR &= (uint32_t) 0x88FF400C;
+
+	/*!< Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
+	RCC->CR &= (uint32_t)0xFEF6FFF6;
+
+	/*!< Reset HSI48ON  bit */
+	RCC->CRRCR &= (uint32_t)0xFFFFFFFE;
+
+	/*!< Reset HSEBYP bit */
+	RCC->CR &= (uint32_t)0xFFFBFFFF;
+
+	/*!< Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits */
+	RCC->CFGR &= (uint32_t)0xFF02FFFF;
+
+	/*!< Disable all interrupts */
+	RCC->CIER = 0x00000000;
+
+	RCC->IOPENR |= 0
+			| RCC_IOPENR_GPIOAEN
+			| RCC_IOPENR_GPIOBEN
+	  ;
+	RCC->APB2ENR |= 0
+			| RCC_APB2ENR_SPI1EN
+	  ;
+
+	GPIOA->MODER = (GPIOA->MODER
+			& (~GPIO_MODER_MODE5)      // RED LED
+			& (~GPIO_MODER_MODE8)      // EPD_BUSY
+			& (~GPIO_MODER_MODE15)     // EPD_CS
+	) | (0
+			| (GPIO_Mode_Out * GPIO_MODER_MODE5_0)   // RED LED
+			| (GPIO_Mode_In  * GPIO_MODER_MODE8_0)   // EPD_BUSY
+			| (GPIO_Mode_Out * GPIO_MODER_MODE15_0)  // EPD_CS
+	);
+
+	GPIOA->OSPEEDR = (GPIOA->OSPEEDR
+			& (~GPIO_OSPEEDER_OSPEED15)    // EPD_CS
+	) | (0
+			| (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED15_0)  // EPD_CS
+	);
+	GPIOA->PUPDR = (GPIOA->PUPDR
+			& (~GPIO_PUPDR_PUPD8)    // EPD_BUSY
+	) | (0
+			| (GPIO_PullDown * GPIO_PUPDR_PUPD8_0)  // EPD_BUSY
+	);
+
+	GPIOB->MODER = (GPIOB->MODER
+			& (~GPIO_MODER_MODE4)      // GREEN LED
+			& (~GPIO_MODER_MODE2)      // EPD_RESET
+			& (~GPIO_MODER_MODE10)     // EPD_PWR
+			& (~GPIO_MODER_MODE11)     // EPD_DC
+			& (~GPIO_MODER_MODE3)      // SPIx_SCK
+			& (~GPIO_MODER_MODE5)      // SPIx_MOSI
+	) | (0
+			| (GPIO_Mode_Out * GPIO_MODER_MODE4_0)   // RED LED
+			| (GPIO_Mode_Out * GPIO_MODER_MODE2_0)   // EPD_RESET
+			| (GPIO_Mode_Out * GPIO_MODER_MODE10_0)  // EPD_PWR
+			| (GPIO_Mode_Out * GPIO_MODER_MODE11_0)  // EPD_DC
+			| (GPIO_Mode_AlternateFunction * GPIO_MODER_MODE3_0)  // SPIx_SCK
+			| (GPIO_Mode_AlternateFunction * GPIO_MODER_MODE5_0)  // SPIx_MOSI
+	);
+	GPIOB->OSPEEDR = (GPIOB->OSPEEDR
+			& (~GPIO_OSPEEDER_OSPEED2)     // EPD_RESET
+			& (~GPIO_OSPEEDER_OSPEED10)    // EPD_PWR
+			& (~GPIO_OSPEEDER_OSPEED11)    // EPD_DC
+			& (~GPIO_OSPEEDER_OSPEED3)     // SPIx_SCK
+			& (~GPIO_OSPEEDER_OSPEED5)     // SPIx_MOSI
+	) | (0
+			| (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED2_0)   // EPD_RESET
+			| (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED10_0)  // EPD_PWR
+			| (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED11_0)  // EPD_DC
+			| (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED3_0)   // SPIx_SCK
+			| (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED5_0)   // SPIx_MOSI
+	);
+	GPIOB->PUPDR = (GPIOB->PUPDR
+			& (~GPIO_PUPDR_PUPD3)    // SPIx_SCK
+			& (~GPIO_PUPDR_PUPD5)    // SPIx_MOSI
+	) | (0
+			| (GPIO_PullUp   * GPIO_PUPDR_PUPD3_0)  // SPIx_SCK
+			| (GPIO_PullDown * GPIO_PUPDR_PUPD5_0)  // SPIx_MOSI
+	);
+	GPIOB->AFR[0] = (GPIOB->AFR[0]
+								& (~ (GPIO_AFRx * GPIO_AFRL_AFRL3_0))    // SPIx_SCK
+								& (~ (GPIO_AFRx * GPIO_AFRL_AFRL5_0))    // SPIx_MOSI
+	) | (0
+			| (GPIO_AlternateFunction_SPI1 * GPIO_AFRL_AFRL3_0)  // SPIx_SCK
+			| (GPIO_AlternateFunction_SPI1 * GPIO_AFRL_AFRL5_0)  // SPIx_MOSI
+	);
+}
 
 int main(void) {
- /*!< Set MSION bit */
-  RCC->CR |= (uint32_t)0x00000100;
+	uint8_t buf[5], res;
 
-  /*!< Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and MCOPRE[2:0] bits */
-  RCC->CFGR &= (uint32_t) 0x88FF400C;
+	char strDisp[25];
 
-  /*!< Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
-  RCC->CR &= (uint32_t)0xFEF6FFF6;
+	HAL_Init();
 
-  /*!< Reset HSI48ON  bit */
-  RCC->CRRCR &= (uint32_t)0xFFFFFFFE;
+	Init_ePaper_GPIOs();
 
-  /*!< Reset HSEBYP bit */
-  RCC->CR &= (uint32_t)0xFFFBFFFF;
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /*!< Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits */
-  RCC->CFGR &= (uint32_t)0xFF02FFFF;
-
-  /*!< Disable all interrupts */
-  RCC->CIER = 0x00000000;
-
-
-  RCC->IOPENR |= 0
-    | RCC_IOPENR_GPIOAEN
-    | RCC_IOPENR_GPIOBEN
-  ;
-  RCC->APB2ENR |= 0
-    | RCC_APB2ENR_SPI1EN
-  ;
-
-  GPIOA->MODER = (GPIOA->MODER
-    & (~GPIO_MODER_MODE5)      // RED LED
-    & (~GPIO_MODER_MODE8)      // EPD_BUSY
-    & (~GPIO_MODER_MODE15)     // EPD_CS
-  ) | (0
-    | (GPIO_Mode_Out * GPIO_MODER_MODE5_0)   // RED LED
-    | (GPIO_Mode_In  * GPIO_MODER_MODE8_0)   // EPD_BUSY
-    | (GPIO_Mode_Out * GPIO_MODER_MODE15_0)  // EPD_CS
-  );
-
-  GPIOA->OSPEEDR = (GPIOA->OSPEEDR
-    & (~GPIO_OSPEEDER_OSPEED15)    // EPD_CS
-  ) | (0
-    | (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED15_0)  // EPD_CS
-  );
-  GPIOA->PUPDR = (GPIOA->PUPDR
-    & (~GPIO_PUPDR_PUPD8)    // EPD_BUSY
-  ) | (0
-    | (GPIO_PullDown * GPIO_PUPDR_PUPD8_0)  // EPD_BUSY
-  );
-
-  GPIOB->MODER = (GPIOB->MODER
-    & (~GPIO_MODER_MODE4)      // GREEN LED
-    & (~GPIO_MODER_MODE2)      // EPD_RESET
-    & (~GPIO_MODER_MODE10)     // EPD_PWR
-    & (~GPIO_MODER_MODE11)     // EPD_DC
-    & (~GPIO_MODER_MODE3)      // SPIx_SCK
-    & (~GPIO_MODER_MODE5)      // SPIx_MOSI
-  ) | (0
-    | (GPIO_Mode_Out * GPIO_MODER_MODE4_0)   // RED LED
-    | (GPIO_Mode_Out * GPIO_MODER_MODE2_0)   // EPD_RESET
-    | (GPIO_Mode_Out * GPIO_MODER_MODE10_0)  // EPD_PWR
-    | (GPIO_Mode_Out * GPIO_MODER_MODE11_0)  // EPD_DC
-    | (GPIO_Mode_AlternateFunction * GPIO_MODER_MODE3_0)  // SPIx_SCK
-    | (GPIO_Mode_AlternateFunction * GPIO_MODER_MODE5_0)  // SPIx_MOSI
-  );
-  GPIOB->OSPEEDR = (GPIOB->OSPEEDR
-    & (~GPIO_OSPEEDER_OSPEED2)     // EPD_RESET
-    & (~GPIO_OSPEEDER_OSPEED10)    // EPD_PWR
-    & (~GPIO_OSPEEDER_OSPEED11)    // EPD_DC
-    & (~GPIO_OSPEEDER_OSPEED3)     // SPIx_SCK
-    & (~GPIO_OSPEEDER_OSPEED5)     // SPIx_MOSI
-  ) | (0
-    | (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED2_0)   // EPD_RESET
-    | (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED10_0)  // EPD_PWR
-    | (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED11_0)  // EPD_DC
-    | (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED3_0)   // SPIx_SCK
-    | (GPIO_Speed_High * GPIO_OSPEEDER_OSPEED5_0)   // SPIx_MOSI
-  );
-  GPIOB->PUPDR = (GPIOB->PUPDR
-    & (~GPIO_PUPDR_PUPD3)    // SPIx_SCK
-    & (~GPIO_PUPDR_PUPD5)    // SPIx_MOSI
-  ) | (0
-    | (GPIO_PullUp   * GPIO_PUPDR_PUPD3_0)  // SPIx_SCK
-    | (GPIO_PullDown * GPIO_PUPDR_PUPD5_0)  // SPIx_MOSI
-  );
-  GPIOB->AFR[0] = (GPIOB->AFR[0]
-    & (~ (GPIO_AFRx * GPIO_AFRL_AFRL3_0))    // SPIx_SCK
-    & (~ (GPIO_AFRx * GPIO_AFRL_AFRL5_0))    // SPIx_MOSI
-  ) | (0
-    | (GPIO_AlternateFunction_SPI1 * GPIO_AFRL_AFRL3_0)  // SPIx_SCK
-    | (GPIO_AlternateFunction_SPI1 * GPIO_AFRL_AFRL5_0)  // SPIx_MOSI
-  );
-
-
-  HAL_Init();
-
- /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-
-  /* Initialize the EPD */
-  BSP_EPD_Init();
-
-  BSP_EPD_Clear(EPD_COLOR_WHITE);
-
-  while(1)
-  {
-	BSP_EPD_DisplayStringAt(0,0,"HELLO WORLD!", CENTER_MODE);
-	BSP_EPD_RefreshDisplay();
+	/* Initialize the EPD */
+	BSP_EPD_Init();
 	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-	HAL_Delay(2000);
-	BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
-	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear(EPD_COLOR_WHITE);
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_RTC_Init();
 
-	HAL_Delay(2000);
-	BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
-	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear(EPD_COLOR_WHITE);
+	while(1)
+	{
+	    //sprintf(strDisp, "%02d/%02d/%02d %02d:%02d:%02d", sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
 
-	HAL_Delay(2000);
-	BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
-	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear(EPD_COLOR_WHITE);
+		BSP_EPD_DisplayStringAt(0, 40, "TEMP: 25 C, HUM: 20%", CENTER_MODE);
+		BSP_EPD_RefreshDisplay();
+		BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-	HAL_Delay(2000);
-  }
+//		HAL_Delay(2000);
+//		BSP_EPD_DisplayStringAt(0,0,"I LOVE STM32", CENTER_MODE);
+//		BSP_EPD_RefreshDisplay();
+//		BSP_EPD_Clear(EPD_COLOR_WHITE);
+//
+//		HAL_Delay(2000);
+//		BSP_EPD_DisplayStringAt(0,0,"I LOVE C++", CENTER_MODE);
+//		BSP_EPD_RefreshDisplay();
+//		BSP_EPD_Clear(EPD_COLOR_WHITE);
+//
+//		HAL_Delay(2000);
+//		BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
+//		BSP_EPD_RefreshDisplay();
+//		BSP_EPD_Clear(EPD_COLOR_WHITE);
+
+		HAL_Delay(2000);
+	}
 }
 
 
@@ -490,6 +505,68 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0x10;
+  sTime.Minutes = 0x1;
+  sTime.Seconds = 0x20;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_MONDAY;
+  sDate.Month = RTC_MONTH_APRIL;
+  sDate.Date = 0x17;
+  sDate.Year = 0x23;
+
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -509,9 +586,11 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : PA2 */
   GPIO_InitStruct.Pin = GPIO_PIN_2;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+  GPIO_HIGH(GPIOA, GPIO_PIN_2);
 
   /*Configure GPIO pin : PA3 */
   GPIO_InitStruct.Pin = GPIO_PIN_3;
@@ -538,6 +617,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+	  BSP_EPD_DisplayStringAt(0, 40, "RTC ERROR OCCURRED", CENTER_MODE);
+	  BSP_EPD_RefreshDisplay();
+	  BSP_EPD_Clear(EPD_COLOR_WHITE);
   }
   /* USER CODE END Error_Handler_Debug */
 }
