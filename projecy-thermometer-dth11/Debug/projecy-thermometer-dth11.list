@@ -35,11 +35,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_macro  0001408b  00000000  00000000  000266d8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_line   00007021  00000000  00000000  0003a763  2**0
+ 16 .debug_line   00007023  00000000  00000000  0003a763  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    0007a1ef  00000000  00000000  00041784  2**0
+ 17 .debug_str    0007a1ef  00000000  00000000  00041786  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .comment      00000050  00000000  00000000  000bb973  2**0
+ 18 .comment      00000050  00000000  00000000  000bb975  2**0
                   CONTENTS, READONLY
  19 .debug_ranges 00000490  00000000  00000000  000bb9c8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -1808,20 +1808,22 @@ uint8_t read_DHT11(uint8_t *buf){
  8000c0a:	005b      	lsls	r3, r3, #1
  8000c0c:	0018      	movs	r0, r3
  8000c0e:	f000 fdaf 	bl	8001770 <HAL_Delay>
- 	GPIO_LOW(GPIOA,GPIO_PIN_3);
+ 	GPIO_LOW(GPIOA, GPIO_PIN_3);
  8000c12:	23a0      	movs	r3, #160	; 0xa0
  8000c14:	05db      	lsls	r3, r3, #23
  8000c16:	2208      	movs	r2, #8
  8000c18:	619a      	str	r2, [r3, #24]
+ 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, RESET);
 	//Delay(20);
 	HAL_Delay(20);
  8000c1a:	2014      	movs	r0, #20
  8000c1c:	f000 fda8 	bl	8001770 <HAL_Delay>
- 	GPIO_HIGH(GPIOA,GPIO_PIN_3);
+ 	GPIO_HIGH(GPIOA, GPIO_PIN_3);
  8000c20:	23a0      	movs	r3, #160	; 0xa0
  8000c22:	05db      	lsls	r3, r3, #23
  8000c24:	2208      	movs	r2, #8
  8000c26:	619a      	str	r2, [r3, #24]
+ 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, SET);
 
   //start reading
  	cnt = 0;
@@ -1900,11 +1902,12 @@ uint8_t read_DHT11(uint8_t *buf){
 	}
 
  	//release line
-	GPIO_HIGH(GPIOA,GPIO_PIN_3);
+	GPIO_HIGH(GPIOA, GPIO_PIN_3);
  8000caa:	23a0      	movs	r3, #160	; 0xa0
  8000cac:	05db      	lsls	r3, r3, #23
  8000cae:	2208      	movs	r2, #8
  8000cb0:	619a      	str	r2, [r3, #24]
+	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, SET);
 
 	if (cnt>=MAX_TICS) return DHT11_NO_CONN;
  8000cb2:	235e      	movs	r3, #94	; 0x5e
@@ -2395,7 +2398,7 @@ int main(void) {
  8000f54:	19bb      	adds	r3, r7, r6
  8000f56:	781b      	ldrb	r3, [r3, #0]
  8000f58:	2b00      	cmp	r3, #0
- 8000f5a:	d109      	bne.n	8000f70 <main+0xc0>
+ 8000f5a:	d108      	bne.n	8000f6e <main+0xbe>
 			sprintf(strDisp, "RH=%02d%% t=%dC", buf[0], buf[2]);
  8000f5c:	197b      	adds	r3, r7, r5
  8000f5e:	781b      	ldrb	r3, [r3, #0]
@@ -2405,51 +2408,53 @@ int main(void) {
  8000f66:	491a      	ldr	r1, [pc, #104]	; (8000fd0 <main+0x120>)
  8000f68:	1d38      	adds	r0, r7, #4
  8000f6a:	f001 fc6d 	bl	8002848 <siprintf>
- 8000f6e:	e016      	b.n	8000f9e <main+0xee>
-		else if (res==DHT11_CS_ERROR)
- 8000f70:	2327      	movs	r3, #39	; 0x27
- 8000f72:	18fb      	adds	r3, r7, r3
- 8000f74:	781b      	ldrb	r3, [r3, #0]
- 8000f76:	2b02      	cmp	r3, #2
- 8000f78:	d106      	bne.n	8000f88 <main+0xd8>
+
+		if (res==DHT11_CS_ERROR)
+ 8000f6e:	2327      	movs	r3, #39	; 0x27
+ 8000f70:	18fb      	adds	r3, r7, r3
+ 8000f72:	781b      	ldrb	r3, [r3, #0]
+ 8000f74:	2b02      	cmp	r3, #2
+ 8000f76:	d105      	bne.n	8000f84 <main+0xd4>
 			sprintf(strDisp,"CHECKSUM ERROR");
- 8000f7a:	4a16      	ldr	r2, [pc, #88]	; (8000fd4 <main+0x124>)
- 8000f7c:	1d3b      	adds	r3, r7, #4
- 8000f7e:	0011      	movs	r1, r2
- 8000f80:	0018      	movs	r0, r3
- 8000f82:	f001 fc61 	bl	8002848 <siprintf>
- 8000f86:	e00a      	b.n	8000f9e <main+0xee>
-		else if (res==DHT11_NO_CONN)
- 8000f88:	2327      	movs	r3, #39	; 0x27
- 8000f8a:	18fb      	adds	r3, r7, r3
- 8000f8c:	781b      	ldrb	r3, [r3, #0]
- 8000f8e:	2b01      	cmp	r3, #1
- 8000f90:	d105      	bne.n	8000f9e <main+0xee>
+ 8000f78:	4a16      	ldr	r2, [pc, #88]	; (8000fd4 <main+0x124>)
+ 8000f7a:	1d3b      	adds	r3, r7, #4
+ 8000f7c:	0011      	movs	r1, r2
+ 8000f7e:	0018      	movs	r0, r3
+ 8000f80:	f001 fc62 	bl	8002848 <siprintf>
+
+		if (res==DHT11_NO_CONN)
+ 8000f84:	2327      	movs	r3, #39	; 0x27
+ 8000f86:	18fb      	adds	r3, r7, r3
+ 8000f88:	781b      	ldrb	r3, [r3, #0]
+ 8000f8a:	2b01      	cmp	r3, #1
+ 8000f8c:	d105      	bne.n	8000f9a <main+0xea>
 			sprintf(strDisp,"NO CONNECTED");
- 8000f92:	4a11      	ldr	r2, [pc, #68]	; (8000fd8 <main+0x128>)
- 8000f94:	1d3b      	adds	r3, r7, #4
- 8000f96:	0011      	movs	r1, r2
- 8000f98:	0018      	movs	r0, r3
- 8000f9a:	f001 fc55 	bl	8002848 <siprintf>
+ 8000f8e:	4a12      	ldr	r2, [pc, #72]	; (8000fd8 <main+0x128>)
+ 8000f90:	1d3b      	adds	r3, r7, #4
+ 8000f92:	0011      	movs	r1, r2
+ 8000f94:	0018      	movs	r0, r3
+ 8000f96:	f001 fc57 	bl	8002848 <siprintf>
 
 		BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
- 8000f9e:	1d3a      	adds	r2, r7, #4
- 8000fa0:	2301      	movs	r3, #1
- 8000fa2:	2128      	movs	r1, #40	; 0x28
- 8000fa4:	2000      	movs	r0, #0
- 8000fa6:	f000 f957 	bl	8001258 <BSP_EPD_DisplayStringAt>
+ 8000f9a:	1d3a      	adds	r2, r7, #4
+ 8000f9c:	2301      	movs	r3, #1
+ 8000f9e:	2128      	movs	r1, #40	; 0x28
+ 8000fa0:	2000      	movs	r0, #0
+ 8000fa2:	f000 f959 	bl	8001258 <BSP_EPD_DisplayStringAt>
 		BSP_EPD_RefreshDisplay();
- 8000faa:	f000 fa5f 	bl	800146c <BSP_EPD_RefreshDisplay>
+ 8000fa6:	f000 fa61 	bl	800146c <BSP_EPD_RefreshDisplay>
 		BSP_EPD_Clear(EPD_COLOR_WHITE);
- 8000fae:	20ff      	movs	r0, #255	; 0xff
- 8000fb0:	f000 f8f6 	bl	80011a0 <BSP_EPD_Clear>
+ 8000faa:	20ff      	movs	r0, #255	; 0xff
+ 8000fac:	f000 f8f8 	bl	80011a0 <BSP_EPD_Clear>
 //		HAL_Delay(2000);
 //		BSP_EPD_DisplayStringAt(0,0,"45 Celsius", CENTER_MODE);
 //		BSP_EPD_RefreshDisplay();
 //		BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-		HAL_Delay(100);
- 8000fb4:	2064      	movs	r0, #100	; 0x64
+		HAL_Delay(500);
+ 8000fb0:	23fa      	movs	r3, #250	; 0xfa
+ 8000fb2:	005b      	lsls	r3, r3, #1
+ 8000fb4:	0018      	movs	r0, r3
  8000fb6:	f000 fbdb 	bl	8001770 <HAL_Delay>
 		res = read_DHT11(buf);
  8000fba:	e7c2      	b.n	8000f42 <main+0x92>
@@ -2627,11 +2632,11 @@ static void MX_GPIO_Init(void)
  80010b6:	1d3b      	adds	r3, r7, #4
  80010b8:	2200      	movs	r2, #0
  80010ba:	605a      	str	r2, [r3, #4]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  //GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
  80010bc:	1d3b      	adds	r3, r7, #4
  80010be:	2200      	movs	r2, #0
- 80010c0:	609a      	str	r2, [r3, #8]
-  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 80010c0:	60da      	str	r2, [r3, #12]
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
  80010c2:	1d3a      	adds	r2, r7, #4
  80010c4:	23a0      	movs	r3, #160	; 0xa0

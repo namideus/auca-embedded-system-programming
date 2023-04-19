@@ -9,9 +9,9 @@ main.c:224:10:EPD_IO_ReadData	1
 main.c:243:6:EPD_Delay	1
 main.c:248:10:read_cycle	7
 main.c:266:9:read_DHT11	11
-main.c:326:6:Init_ePaper_GPIOs	1
-main.c:422:5:main	4
-main.c:495:6:SystemClock_Config	3
-main.c:537:13:MX_RTC_Init	4
-main.c:599:13:MX_GPIO_Init	1
-main.c:639:6:Error_Handler	1
+main.c:329:6:Init_ePaper_GPIOs	1
+main.c:425:5:main	4
+main.c:500:6:SystemClock_Config	3
+main.c:542:13:MX_RTC_Init	4
+main.c:604:13:MX_GPIO_Init	1
+main.c:644:6:Error_Handler	1

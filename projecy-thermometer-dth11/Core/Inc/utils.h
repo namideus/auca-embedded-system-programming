@@ -22,8 +22,8 @@
 
 /* Exported macro ------------------------------------------------------------*/
 /* MACROs for SET, RESET or TOGGLE Output port */
-#define GPIO_HIGH(a,b) 		a->BSRR = b
-#define GPIO_LOW(a,b)			a->BSRR = b
+#define GPIO_HIGH(a,b) 	a->BSRR  = b
+#define GPIO_LOW(a,b)	a->BSRR  = b
 #define GPIO_TOGGLE(a,b) 	a->ODR ^= b 
 
 /* Exported functions ------------------------------------------------------- */

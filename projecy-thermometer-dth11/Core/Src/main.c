@@ -271,10 +271,12 @@ uint8_t read_DHT11(uint8_t *buf){
 	//reset DHT11
 	//Delay(500);
 	HAL_Delay(500);
- 	GPIO_LOW(GPIOA,GPIO_PIN_3);
+ 	GPIO_LOW(GPIOA, GPIO_PIN_3);
+ 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, RESET);
 	//Delay(20);
 	HAL_Delay(20);
- 	GPIO_HIGH(GPIOA,GPIO_PIN_3);
+ 	GPIO_HIGH(GPIOA, GPIO_PIN_3);
+ 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, SET);
 
   //start reading
  	cnt = 0;
@@ -289,7 +291,8 @@ uint8_t read_DHT11(uint8_t *buf){
 	}
 
  	//release line
-	GPIO_HIGH(GPIOA,GPIO_PIN_3);
+	GPIO_HIGH(GPIOA, GPIO_PIN_3);
+	// HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, SET);
 
 	if (cnt>=MAX_TICS) return DHT11_NO_CONN;
 
@@ -459,9 +462,11 @@ int main(void) {
 
 		if (res==DHT11_OK)
 			sprintf(strDisp, "RH=%02d%% t=%dC", buf[0], buf[2]);
-		else if (res==DHT11_CS_ERROR)
+
+		if (res==DHT11_CS_ERROR)
 			sprintf(strDisp,"CHECKSUM ERROR");
-		else if (res==DHT11_NO_CONN)
+
+		if (res==DHT11_NO_CONN)
 			sprintf(strDisp,"NO CONNECTED");
 
 		BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
@@ -483,7 +488,7 @@ int main(void) {
 //		BSP_EPD_RefreshDisplay();
 //		BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-		HAL_Delay(100);
+		HAL_Delay(500);
 	}
 }
 
@@ -620,8 +625,8 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : PA3 */
   GPIO_InitStruct.Pin = GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  //GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
