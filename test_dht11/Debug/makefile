@@ -60,8 +60,8 @@ all: main-build
 main-build: test_dht11.elf secondary-outputs
 
 # Tool invocations
-test_dht11.elf test_dht11.map: $(OBJS) $(USER_OBJS) C:\Users\altynbek_y.AU\Documents\aaaa\test_dht11\STM32L053C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "test_dht11.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\altynbek_y.AU\Documents\aaaa\test_dht11\STM32L053C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="test_dht11.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+test_dht11.elf test_dht11.map: $(OBJS) $(USER_OBJS) C:\Users\nami-pc\Desktop\AUCA_2023_SPRING\Embedded\ System\ Programming\auca-embedded-system-programming\test_dht11\STM32L053C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "test_dht11.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\nami-pc\Desktop\AUCA_2023_SPRING\Embedded System Programming\auca-embedded-system-programming\test_dht11\STM32L053C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="test_dht11.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
