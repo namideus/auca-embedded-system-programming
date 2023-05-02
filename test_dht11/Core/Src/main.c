@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "dhtxx.h"
+
 #include "dht11.h"
 #include "stm32l053xx.h"
 #include "stm32l0xx_hal_rcc.h"
@@ -35,7 +37,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+DHTxx_Drv_t dht1;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -316,6 +318,15 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
+
+  // testing dhtxx lib
+  DwtInit();
+   /* Set DHT parameter */
+  dht1.DataPin = GPIO_PIN_4;
+  dht1.DataPort = GPIOA;
+  dht1.Type = DHT11;
+  //-------------------------------
+
   BSP_EPD_Init();
 
   BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
@@ -336,6 +347,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	/*HAL_Delay(2000);
+
 	res = read_DHT11(buf);
 
 	if (res==DHT11_OK)
@@ -349,10 +362,19 @@ int main(void)
 
 	BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
 	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);*/
+
+//	DHT_GetData(&dht1);
+	sprintf(strDisp, "RH=%02d%% t=%dC", (int)dht1.Humidity, (int)dht1.Temperature);
+
+	BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
 	BSP_EPD_Clear(EPD_COLOR_WHITE);
 
-	HAL_Delay(2000);
+	//DwtDelay_ms(2000);
+
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
 
 	//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_4);
@@ -430,7 +452,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00000708;
+  hi2c1.Init.Timing = 0x00707CBB;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -722,6 +744,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+	  BSP_EPD_DisplayStringAt(0, 42, (unsigned char *)"ERROR OCCURRED", CENTER_MODE);
+	  BSP_EPD_Clear(EPD_COLOR_WHITE);
+	  BSP_EPD_RefreshDisplay();
   }
   /* USER CODE END Error_Handler_Debug */
 }
