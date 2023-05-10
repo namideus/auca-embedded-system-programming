@@ -25,7 +25,6 @@
 #include "cQueue.h"
 #include <stdio.h>
 #include <string.h>
-
 #include "picture.h"
 #include "gde021a1.h"
 #include "stm32l0538_discovery.h"
@@ -252,6 +251,7 @@ int main(void)
 
   // Initializing the queue
   q_init(&q, 10, 10, IMPLEMENTATION, false);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

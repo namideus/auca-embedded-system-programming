@@ -3753,9 +3753,10 @@ int main(void)
  80019da:	f000 fa21 	bl	8001e20 <MX_USB_PCD_Init>
   /* USER CODE BEGIN 2 */
 
-  BSP_EPD_Init();
+  BSP_EPD_Init();	// Initting the EPD display
  80019de:	f000 faf9 	bl	8001fd4 <BSP_EPD_Init>
 
+  // Showcasing
   BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
  80019e2:	4b35      	ldr	r3, [pc, #212]	; (8001ab8 <main+0x104>)
  80019e4:	9300      	str	r3, [sp, #0]
@@ -3774,6 +3775,7 @@ int main(void)
  80019fe:	0018      	movs	r0, r3
  8001a00:	f001 f854 	bl	8002aac <HAL_Delay>
 
+  // My signature, not neccessary though
   BSP_EPD_DisplayStringAt(0, 45, (unsigned char *)"Introduction to", CENTER_MODE);
  8001a04:	4a2e      	ldr	r2, [pc, #184]	; (8001ac0 <main+0x10c>)
  8001a06:	2301      	movs	r3, #1
@@ -3808,8 +3810,10 @@ int main(void)
  8001a40:	0018      	movs	r0, r3
  8001a42:	f001 f833 	bl	8002aac <HAL_Delay>
 
+  // DHT sensor configs
   static DHT_sensor livingRoom = {GPIOA, GPIO_PIN_4, DHT22, GPIO_PULLUP};
 
+  // Initializing the queue
   q_init(&q, 10, 10, IMPLEMENTATION, false);
  8001a46:	4823      	ldr	r0, [pc, #140]	; (8001ad4 <main+0x120>)
  8001a48:	2300      	movs	r3, #0
@@ -3818,11 +3822,11 @@ int main(void)
  8001a4e:	220a      	movs	r2, #10
  8001a50:	210a      	movs	r1, #10
  8001a52:	f7ff fbf3 	bl	800123c <q_init>
-  /* USER CODE BEGIN WHILE */
-  while (1)
   {
+	// Buffer
 	char msg[40];
 
+	// Reading data fromt the sensor
 	d = DHT_getData(&livingRoom);
  8001a56:	4c20      	ldr	r4, [pc, #128]	; (8001ad8 <main+0x124>)
  8001a58:	003b      	movs	r3, r7
@@ -3835,6 +3839,7 @@ int main(void)
  8001a68:	ca03      	ldmia	r2!, {r0, r1}
  8001a6a:	c303      	stmia	r3!, {r0, r1}
 
+	// Printing data to buffer
     sprintf(msg, "Temp %dC, Hum %d%%", (uint8_t)d.temp, (uint8_t)d.hum);
  8001a6c:	4b1a      	ldr	r3, [pc, #104]	; (8001ad8 <main+0x124>)
  8001a6e:	685b      	ldr	r3, [r3, #4]
