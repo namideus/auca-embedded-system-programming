@@ -9,3 +9,7 @@ Finally, students will delve into the basics of powerful debugging tools by putt
 and ultimately learn to refactor and organize code.By the end of this course, students will have the fundamental skills necessary for embedded firmware 
 development, helping students design and build products of their own.
 
+![2431225-40](https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/831889db-80ed-4cc5-aa1e-373d544256dc)
+![51xgARcQu5L](https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/0ebf2156-3978-4ffd-836b-2a0848f3df7f)
+![SN-DHT11-MOD (a)-800x800](https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/098a01cc-f3b8-4e58-8510-3d95ddb4688b)
+
