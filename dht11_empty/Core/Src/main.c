@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "DHT.h"
+#include "cQueue.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -47,6 +48,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 DHT_data d;
+
+Queue_t	q;	// Queue declaration
 
 I2C_HandleTypeDef hi2c1;
 
@@ -231,7 +234,7 @@ int main(void)
   BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
   BSP_EPD_RefreshDisplay();
   BSP_EPD_Clear(EPD_COLOR_WHITE);
-  HAL_Delay(1000);
+  HAL_Delay(1500);
 
   BSP_EPD_DisplayStringAt(0, 45, (unsigned char *)"Introduction to", CENTER_MODE);
   BSP_EPD_DisplayStringAt(0, 42, (unsigned char *)"embedded system", CENTER_MODE);
@@ -239,7 +242,7 @@ int main(void)
   BSP_EPD_DisplayStringAt(0, 36, (unsigned char *)"student Yiman A.u.", CENTER_MODE);
   BSP_EPD_RefreshDisplay();
   BSP_EPD_Clear(EPD_COLOR_WHITE);
-  HAL_Delay(2000);
+  HAL_Delay(3000);
 
   static DHT_sensor livingRoom = {GPIOA, GPIO_PIN_4, DHT22, GPIO_PULLUP};
   /* USER CODE END 2 */

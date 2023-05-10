@@ -1,0 +1,9 @@
+cQueue.c:40:33:q_init	2
+cQueue.c:66:33:q_init_static	3
+cQueue.c:93:31:q_kill	4
+cQueue.c:100:31:q_flush	1
+cQueue.c:108:31:q_push	8
+cQueue.c:127:31:q_pop	6
+cQueue.c:150:31:q_peek	5
+cQueue.c:173:31:q_drop	6
+cQueue.c:185:31:q_peekIdx	4

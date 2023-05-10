@@ -1,4 +1,5 @@
 "./Core/Src/DHT.o"
+"./Core/Src/cQueue.o"
 "./Core/Src/font12epd.o"
 "./Core/Src/font16epd.o"
 "./Core/Src/font20epd.o"
