@@ -39,6 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define	IMPLEMENTATION	LIFO
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -229,13 +230,15 @@ int main(void)
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
 
-  BSP_EPD_Init();
+  BSP_EPD_Init();	// Initting the EPD display
 
+  // Showcasing
   BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
   BSP_EPD_RefreshDisplay();
   BSP_EPD_Clear(EPD_COLOR_WHITE);
   HAL_Delay(1500);
 
+  // My signature, not neccessary though
   BSP_EPD_DisplayStringAt(0, 45, (unsigned char *)"Introduction to", CENTER_MODE);
   BSP_EPD_DisplayStringAt(0, 42, (unsigned char *)"embedded system", CENTER_MODE);
   BSP_EPD_DisplayStringAt(0, 39, (unsigned char *)"programming", CENTER_MODE);
@@ -244,17 +247,24 @@ int main(void)
   BSP_EPD_Clear(EPD_COLOR_WHITE);
   HAL_Delay(3000);
 
+  // DHT sensor configs
   static DHT_sensor livingRoom = {GPIOA, GPIO_PIN_4, DHT22, GPIO_PULLUP};
+
+  // Initializing the queue
+  q_init(&q, 10, 10, IMPLEMENTATION, false);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	// Buffer
 	char msg[40];
 
+	// Reading data fromt the sensor
 	d = DHT_getData(&livingRoom);
 
+	// Printing data to buffer
     sprintf(msg, "Temp %dC, Hum %d%%", (uint8_t)d.temp, (uint8_t)d.hum);
 
     BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)msg, CENTER_MODE);

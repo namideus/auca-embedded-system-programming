@@ -1,6 +1,0 @@
-dhtxx.c:15:13:Set_Pin_Mode	2
-dhtxx.c:42:13:Set_Pin_Level	1
-dhtxx.c:61:16:Bus_Read	1
-dhtxx.c:75:16:DHT_Check_Response	5
-dhtxx.c:116:16:DHT_Read	5
-dhtxx.c:145:6:DHT_GetData	3
