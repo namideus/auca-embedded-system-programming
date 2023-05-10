@@ -9,6 +9,7 @@ Finally, students will delve into the basics of powerful debugging tools by putt
 and ultimately learn to refactor and organize code.By the end of this course, students will have the fundamental skills necessary for embedded firmware 
 development, helping students design and build products of their own.
 
+## Final project: thermometer based on stm32l053-disco and dht11/dht22
 <p align="center">
 <img src="https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/831889db-80ed-4cc5-aa1e-373d544256dc" width=18% height=18%>
 <img src="https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/0ebf2156-3978-4ffd-836b-2a0848f3df7f" width=18% height=18%>
