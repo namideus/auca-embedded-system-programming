@@ -1,3 +1,4 @@
+"./Core/Src/DHT.o"
 "./Core/Src/dhtxx.o"
 "./Core/Src/dwt.o"
 "./Core/Src/font12epd.o"

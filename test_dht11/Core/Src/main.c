@@ -21,9 +21,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "dhtxx.h"
+//#include "dhtxx.h"
+//#include "dht11.h"
+#include "DHT.h"
+#include <stdio.h>
+#include <string.h>
 
-#include "dht11.h"
 #include "stm32l053xx.h"
 #include "stm32l0xx_hal_rcc.h"
 #include "stm32l0xx_hal_gpio.h"
@@ -37,7 +40,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-DHTxx_Drv_t dht1;
+//DHTxx_Drv_t dht1;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -320,16 +323,17 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // testing dhtxx lib
-  DwtInit();
+  //DwtInit();
    /* Set DHT parameter */
-  dht1.DataPin = GPIO_PIN_4;
-  dht1.DataPort = GPIOA;
-  dht1.Type = DHT11;
+  //dht1.DataPin = GPIO_PIN_4;
+  //dht1.DataPort = GPIOA;
+  //dht1.Type = DHT11;
   //-------------------------------
+  static DHT_sensor livingRoom = {GPIOA, GPIO_PIN_4, DHT11, GPIO_NOPULL};
 
   BSP_EPD_Init();
 
-  BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
+ /* BSP_EPD_DrawImage(0, 0, 72, 172, (uint8_t*) picture_1);
   BSP_EPD_RefreshDisplay();
   BSP_EPD_Clear(EPD_COLOR_WHITE);
   HAL_Delay(1000);
@@ -340,44 +344,31 @@ int main(void)
   BSP_EPD_DisplayStringAt(0, 36, (unsigned char *)"by Yiman A.u.", CENTER_MODE);
   BSP_EPD_RefreshDisplay();
   BSP_EPD_Clear(EPD_COLOR_WHITE);
-  HAL_Delay(2000);
+  HAL_Delay(2000);*/
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	/*HAL_Delay(2000);
-
-	res = read_DHT11(buf);
-
-	if (res==DHT11_OK)
-		sprintf(strDisp, "RH=%02d%% t=%dC", buf[0], buf[2]);
-
-	if (res==DHT11_CS_ERROR)
-		sprintf(strDisp,"CHECKSUM ERROR");
-
-	if (res==DHT11_NO_CONN)
-		sprintf(strDisp,"NOT CONNECTED");
-
-	BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
-	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear(EPD_COLOR_WHITE);*/
-
-//	DHT_GetData(&dht1);
-	sprintf(strDisp, "RH=%02d%% t=%dC", (int)dht1.Humidity, (int)dht1.Temperature);
-
-	BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)strDisp, CENTER_MODE);
-	BSP_EPD_RefreshDisplay();
-	BSP_EPD_Clear(EPD_COLOR_WHITE);
-
-	//DwtDelay_ms(2000);
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	char msg[40];
+	//Получение данных �? датчика
+	DHT_data d = DHT_getData(&livingRoom);
+	//Печать данных в буффер
+	sprintf(msg, "Temp %dC, Hum %d%%", (uint8_t)d.temp, (uint8_t)d.hum);
+	//Отправка тек�?та в UART
 
-	//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_4);
+	BSP_EPD_DisplayStringAt(0, 40, (unsigned char *)msg, CENTER_MODE);
+	BSP_EPD_RefreshDisplay();
+	BSP_EPD_Clear(EPD_COLOR_WHITE);
+
+	HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFF);
+
 	//HAL_Delay(1000);
   }
   /* USER CODE END 3 */
@@ -714,8 +705,8 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : PA4 LD_R_Pin */
   GPIO_InitStruct.Pin = GPIO_PIN_4|LD_R_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  //GPIO_InitStruct.Pull = GPIO_NOPULL;
+  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : ePD1_RESET_Pin ePD1_PWR_ENn_Pin ePD1_D_C_Pin LD_G_Pin */

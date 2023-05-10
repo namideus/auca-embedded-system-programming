@@ -1,0 +1,17 @@
+stm32l0538_discovery_epd.c:100:9:BSP_EPD_Init	1
+stm32l0538_discovery_epd.c:221:10:BSP_EPD_GetXSize	1
+stm32l0538_discovery_epd.c:231:10:BSP_EPD_GetYSize	1
+stm32l0538_discovery_epd.c:241:6:BSP_EPD_SetFont	1
+stm32l0538_discovery_epd.c:251:8:BSP_EPD_GetFont	1
+stm32l0538_discovery_epd.c:261:6:BSP_EPD_Clear	2
+stm32l0538_discovery_epd.c:280:6:BSP_EPD_DisplayChar	1
+stm32l0538_discovery_epd.c:299:6:BSP_EPD_DisplayStringAt	7
+stm32l0538_discovery_epd.c:359:6:BSP_EPD_DisplayStringAtLine	1
+stm32l0538_discovery_epd.c:371:6:BSP_EPD_DrawHLine	2
+stm32l0538_discovery_epd.c:391:6:BSP_EPD_DrawVLine	2
+stm32l0538_discovery_epd.c:412:6:BSP_EPD_DrawRect	1
+stm32l0538_discovery_epd.c:431:6:BSP_EPD_FillRect	2
+stm32l0538_discovery_epd.c:453:6:BSP_EPD_DrawImage	2
+stm32l0538_discovery_epd.c:470:6:BSP_EPD_CloseChargePump	1
+stm32l0538_discovery_epd.c:484:6:BSP_EPD_RefreshDisplay	2
+stm32l0538_discovery_epd.c:510:14:DrawChar	2
