@@ -33,7 +33,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -47,10 +46,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-DHT_data d;
-
-Queue_t	q;	// Queue declaration
-
 I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
@@ -63,7 +58,11 @@ UART_HandleTypeDef huart1;
 PCD_HandleTypeDef hpcd_USB_FS;
 
 /* USER CODE BEGIN PV */
+char msg[40];
 
+DHT_data d;
+
+Queue_t	q;	// Queue declaration
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -191,6 +190,32 @@ uint16_t EPD_IO_ReadData(void) {
 void EPD_Delay (uint32_t n) {
   LoopDelay(n * 3000);  // some fancy factor to get it roughly in ms
 }
+
+
+void Array_MovingAverage( const int* inputSeries,
+                          size_t inputSize,
+                          size_t window,
+                          float* output )
+{
+    int sum = 0 ;
+
+    if( inputSeries != NULL && output != 0 )
+    {
+        for( size_t i = 0; i < inputSize; i++ )
+        {
+            // Add newest sample
+            sum += inputSeries[i] ;
+
+            // Subtract oldest sample
+            if( i >= window )
+            {
+                sum -= inputSeries[i - window] ;
+            }
+
+            output[i] = (float)sum / window ;
+        }
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -247,10 +272,10 @@ int main(void)
   HAL_Delay(3000);
 
   // DHT sensor configs
-  static DHT_sensor livingRoom = {GPIOA, GPIO_PIN_4, DHT22, GPIO_PULLUP};
+  static DHT_sensor sensor = {GPIOA, GPIO_PIN_4, DHT22, GPIO_PULLUP};
 
   // Initializing the queue
-  q_init(&q, 10, 10, IMPLEMENTATION, false);
+  // q_init(&q, sizeof(Rec), 0, IMPLEMENTATION, false);
 
   /* USER CODE END 2 */
 
@@ -258,11 +283,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	// Buffer
-	char msg[40];
-
 	// Reading data fromt the sensor
-	d = DHT_getData(&livingRoom);
+	d = DHT_getData(&sensor);
 
 	// Printing data to buffer
     sprintf(msg, "Temp %dC, Hum %d%%", (uint8_t)d.temp, (uint8_t)d.hum);
