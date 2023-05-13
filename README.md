@@ -17,5 +17,5 @@ development, helping students design and build products of their own.
 </p>
 
 <p align="center">
-<img src="https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/8a8db45d-5ce2-48e4-aaf1-ebe6790ce1ba" width=18% height=18%>
+<img src="https://github.com/altynbek-y/auca-embedded-system-programming/assets/70685477/8a8db45d-5ce2-48e4-aaf1-ebe6790ce1ba" width=40% height=40%>
 </p>
